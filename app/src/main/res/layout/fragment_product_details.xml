@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+        <ImageView android:id="@+id/productPhoto" android:layout_width="match_parent" android:layout_height="220dp" android:background="@drawable/product_photo_background" android:contentDescription="@string/content_product_icon" android:scaleType="centerCrop" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/changePhotoButton" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/change_photo" />
+        <TextView android:id="@+id/detailName" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall" />
+        <TextView android:id="@+id/detailArticle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+        <TextView android:id="@+id/detailQuantity" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textColor="?attr/colorPrimary" android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium" />
+        <TextView android:id="@+id/detailManufacturer" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+        <TextView android:id="@+id/detailLocation" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+        <TextView android:id="@+id/detailNote" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/receiveButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/receive" />
+            <Space android:layout_width="6dp" android:layout_height="1dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/sellButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/sell" />
+            <Space android:layout_width="6dp" android:layout_height="1dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/writeOffButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/write_off" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton android:id="@+id/editButton" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/edit" />
+            <Space android:layout_width="8dp" android:layout_height="1dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/archiveButton" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/archive" />
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="@string/full_history" android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/detailHistoryList" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:nestedScrollingEnabled="false" />
+        <TextView android:id="@+id/detailEmptyHistory" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:padding="28dp" android:text="@string/no_history_title" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
