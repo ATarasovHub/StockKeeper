@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DirectoryDao {
+    @Query("SELECT * FROM manufacturers WHERE name = :name COLLATE NOCASE LIMIT 1")
+    suspend fun findManufacturerByName(name: String): ManufacturerEntity?
+
     @Insert
     suspend fun insertManufacturer(manufacturer: ManufacturerEntity): Long
 
@@ -29,8 +32,14 @@ interface DirectoryDao {
     @Query("SELECT * FROM storage_locations ORDER BY rack COLLATE NOCASE, shelf COLLATE NOCASE")
     fun observeLocations(): Flow<List<StorageLocationEntity>>
 
+    @Query("SELECT * FROM storage_locations WHERE rack = :rack COLLATE NOCASE AND shelf = :shelf COLLATE NOCASE LIMIT 1")
+    suspend fun findLocation(rack: String, shelf: String): StorageLocationEntity?
+
     @Insert
     suspend fun insertCustomer(customer: CustomerEntity): Long
+
+    @Query("SELECT * FROM customers WHERE name = :name COLLATE NOCASE LIMIT 1")
+    suspend fun findCustomerByName(name: String): CustomerEntity?
 
     @Update
     suspend fun updateCustomer(customer: CustomerEntity)

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/language" android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/language_description" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        <com.google.android.material.button.MaterialButtonToggleGroup android:id="@+id/languageGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" app:selectionRequired="true" app:singleSelection="true">
+            <com.google.android.material.button.MaterialButton android:id="@+id/englishButton" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/english" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/ukrainianButton" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ukrainian" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="32dp" android:text="@string/appearance" android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="@string/appearance_description" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        <RadioGroup android:id="@+id/themeGroup" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp">
+            <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/systemTheme" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/system_theme" />
+            <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/lightTheme" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/light_theme" />
+            <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/darkTheme" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dark_theme" />
+        </RadioGroup>
+
+        <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="28dp" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:strokeColor="?attr/colorOutline" app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/backup_title" android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/backup_coming_soon" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="28dp" android:text="@string/about" android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_marginBottom="24dp" android:text="@string/about_text" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+    </LinearLayout>
+</ScrollView>

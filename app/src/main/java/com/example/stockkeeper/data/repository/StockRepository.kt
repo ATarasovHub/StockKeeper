@@ -3,6 +3,9 @@ package com.example.stockkeeper.data.repository
 import androidx.room.withTransaction
 import com.example.stockkeeper.data.local.StockKeeperDatabase
 import com.example.stockkeeper.data.local.entity.ProductEntity
+import com.example.stockkeeper.data.local.entity.ManufacturerEntity
+import com.example.stockkeeper.data.local.entity.StorageLocationEntity
+import com.example.stockkeeper.data.local.entity.CustomerEntity
 import com.example.stockkeeper.data.local.entity.StockTransactionEntity
 import com.example.stockkeeper.data.local.entity.StockTransactionType
 import com.example.stockkeeper.data.local.model.ProductStockItem
@@ -15,6 +18,7 @@ class StockRepository(
 ) {
     private val productDao = database.productDao()
     private val transactionDao = database.stockTransactionDao()
+    private val directoryDao = database.directoryDao()
 
     fun observeStock(
         query: String = "",
@@ -74,6 +78,42 @@ class StockRepository(
         productId
     }
 
+    suspend fun createProductFromForm(
+        article: String,
+        name: String,
+        manufacturerName: String?,
+        rack: String?,
+        shelf: String?,
+        note: String?,
+        initialQuantity: Int,
+    ): Long = database.withTransaction {
+        val cleanManufacturer = manufacturerName?.trim().orEmpty()
+        val manufacturerId = cleanManufacturer.takeIf(String::isNotEmpty)?.let { value ->
+            directoryDao.findManufacturerByName(value)?.id
+                ?: directoryDao.insertManufacturer(ManufacturerEntity(name = value))
+        }
+
+        val cleanRack = rack?.trim().orEmpty()
+        val cleanShelf = shelf?.trim().orEmpty()
+        val locationId = if (cleanRack.isNotEmpty() || cleanShelf.isNotEmpty()) {
+            directoryDao.findLocation(cleanRack, cleanShelf)?.id
+                ?: directoryDao.insertLocation(
+                    StorageLocationEntity(rack = cleanRack, shelf = cleanShelf),
+                )
+        } else {
+            null
+        }
+
+        createProduct(
+            article = article,
+            name = name,
+            manufacturerId = manufacturerId,
+            locationId = locationId,
+            note = note,
+            initialQuantity = initialQuantity,
+        )
+    }
+
     suspend fun receive(
         productId: Long,
         quantity: Int,
@@ -103,6 +143,20 @@ class StockRepository(
             customerId = customerId,
             reason = note,
         )
+    }
+
+    suspend fun sellToCustomer(
+        productId: Long,
+        quantity: Int,
+        customerName: String,
+        occurredAt: Long = currentTimeMillis(),
+        note: String? = null,
+    ): Long = database.withTransaction {
+        val cleanName = customerName.trim()
+        require(cleanName.isNotEmpty()) { "Customer is required for a sale" }
+        val customerId = directoryDao.findCustomerByName(cleanName)?.id
+            ?: directoryDao.insertCustomer(CustomerEntity(name = cleanName))
+        sell(productId, quantity, customerId, occurredAt, note)
     }
 
     suspend fun writeOff(
