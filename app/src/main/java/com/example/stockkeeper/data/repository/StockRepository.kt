@@ -23,7 +23,12 @@ class StockRepository(
     fun observeStock(
         query: String = "",
         manufacturerId: Long? = null,
-    ): Flow<List<ProductStockItem>> = productDao.observeStock(query.trim(), manufacturerId)
+        rack: String = "",
+        shelf: String = "",
+        availability: Int = 0,
+    ): Flow<List<ProductStockItem>> = productDao.observeStock(
+        query.trim(), manufacturerId, rack.trim(), shelf.trim(), availability,
+    )
 
     fun observeManufacturers(): Flow<List<ManufacturerEntity>> =
         directoryDao.observeManufacturers()

@@ -46,13 +46,21 @@ interface ProductDao {
                OR p.name LIKE '%' || :query || '%' COLLATE NOCASE
                OR m.name LIKE '%' || :query || '%' COLLATE NOCASE)
           AND (:manufacturerId IS NULL OR p.manufacturer_id = :manufacturerId)
+          AND (:rack = '' OR l.rack = :rack COLLATE NOCASE)
+          AND (:shelf = '' OR l.shelf = :shelf COLLATE NOCASE)
         GROUP BY p.id
+        HAVING :availability = 0
+            OR (:availability = 1 AND COALESCE(SUM(t.quantity_delta), 0) > 0)
+            OR (:availability = 2 AND COALESCE(SUM(t.quantity_delta), 0) <= 0)
         ORDER BY p.name COLLATE NOCASE, p.article COLLATE NOCASE
         """,
     )
     fun observeStock(
         query: String = "",
         manufacturerId: Long? = null,
+        rack: String = "",
+        shelf: String = "",
+        availability: Int = 0,
     ): Flow<List<ProductStockItem>>
 
     @Query(

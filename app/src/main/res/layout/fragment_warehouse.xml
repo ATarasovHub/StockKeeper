@@ -15,21 +15,24 @@
                 android:completionThreshold="0" android:hint="@string/search_hint" android:imeOptions="actionSearch" android:inputType="text" android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/manufacturer_filter"
-            app:endIconMode="dropdown_menu">
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/manufacturerFilter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:completionThreshold="0"
-                android:inputType="textCapWords"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <LinearLayout android:id="@+id/topFilterRow" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/manufacturerFilterLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="@string/manufacturer_filter" app:endIconMode="dropdown_menu">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/manufacturerFilter" android:layout_width="match_parent" android:layout_height="56dp" android:completionThreshold="0" android:inputType="textCapWords" android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <Space android:layout_width="8dp" android:layout_height="1dp" />
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/availabilityFilterLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="@string/availability_filter" app:endIconMode="dropdown_menu">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/availabilityFilter" android:layout_width="match_parent" android:layout_height="56dp" android:inputType="none" android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/bottomFilterRow" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/rackFilterLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="@string/rack" app:endIconMode="dropdown_menu">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/rackFilter" android:layout_width="match_parent" android:layout_height="56dp" android:inputType="none" android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <Space android:layout_width="8dp" android:layout_height="1dp" />
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/shelfFilterLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="@string/shelf" app:endIconMode="dropdown_menu">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/shelfFilter" android:layout_width="match_parent" android:layout_height="56dp" android:inputType="none" android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/openArchiveButton"

@@ -117,4 +117,12 @@
     <string name="take_photo">Зробити фото</string>
     <string name="choose_gallery">Обрати з галереї</string>
     <string name="camera_permission_denied">Для створення фото потрібен дозвіл на камеру</string>
+    <string name="availability_filter">Наявність</string>
+    <string name="all_availability">Усі товари</string>
+    <string name="in_stock">В наявності</string>
+    <string name="out_of_stock">Немає в наявності</string>
+    <string name="all_racks">Усі стелажі</string>
+    <string name="all_shelves">Усі полиці</string>
+    <string name="warehouse_filters">Фільтри складу</string>
+    <string name="warehouse_filters_description">Виберіть фільтри, які відображаються над списком товарів.</string>
 </resources>

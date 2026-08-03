@@ -8,6 +8,10 @@ object AppSettings {
     private const val PREFERENCES_NAME = "stockkeeper_settings"
     private const val KEY_LANGUAGE = "language"
     private const val KEY_THEME = "theme"
+    private const val KEY_FILTER_MANUFACTURER = "filter_manufacturer"
+    private const val KEY_FILTER_AVAILABILITY = "filter_availability"
+    private const val KEY_FILTER_RACK = "filter_rack"
+    private const val KEY_FILTER_SHELF = "filter_shelf"
 
     const val LANGUAGE_ENGLISH = "en"
     const val LANGUAGE_UKRAINIAN = "uk"
@@ -20,6 +24,16 @@ object AppSettings {
 
     fun theme(context: Context): String = preferences(context)
         .getString(KEY_THEME, THEME_SYSTEM) ?: THEME_SYSTEM
+
+    fun showManufacturerFilter(context: Context): Boolean = filter(context, KEY_FILTER_MANUFACTURER)
+    fun showAvailabilityFilter(context: Context): Boolean = filter(context, KEY_FILTER_AVAILABILITY)
+    fun showRackFilter(context: Context): Boolean = filter(context, KEY_FILTER_RACK)
+    fun showShelfFilter(context: Context): Boolean = filter(context, KEY_FILTER_SHELF)
+
+    fun setShowManufacturerFilter(context: Context, value: Boolean) = setFilter(context, KEY_FILTER_MANUFACTURER, value)
+    fun setShowAvailabilityFilter(context: Context, value: Boolean) = setFilter(context, KEY_FILTER_AVAILABILITY, value)
+    fun setShowRackFilter(context: Context, value: Boolean) = setFilter(context, KEY_FILTER_RACK, value)
+    fun setShowShelfFilter(context: Context, value: Boolean) = setFilter(context, KEY_FILTER_SHELF, value)
 
     fun apply(context: Context) {
         applyTheme(theme(context))
@@ -47,6 +61,12 @@ object AppSettings {
             else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
         AppCompatDelegate.setDefaultNightMode(mode)
+    }
+
+    private fun filter(context: Context, key: String): Boolean = preferences(context).getBoolean(key, true)
+
+    private fun setFilter(context: Context, key: String, value: Boolean) {
+        preferences(context).edit().putBoolean(key, value).apply()
     }
 
     private fun preferences(context: Context) =

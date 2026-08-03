@@ -34,6 +34,7 @@ import com.example.stockkeeper.ui.common.bindCustomerSuggestions
 import com.example.stockkeeper.data.local.model.ProductStockItem
 import com.example.stockkeeper.data.photo.ProductPhotoStore
 import com.example.stockkeeper.search.SearchHistoryStore
+import com.example.stockkeeper.settings.AppSettings
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -89,6 +90,17 @@ class WarehouseFragment : Fragment() {
         inflater.inflate(R.layout.fragment_warehouse, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val showManufacturer = AppSettings.showManufacturerFilter(requireContext())
+        val showAvailability = AppSettings.showAvailabilityFilter(requireContext())
+        val showRack = AppSettings.showRackFilter(requireContext())
+        val showShelf = AppSettings.showShelfFilter(requireContext())
+        view.findViewById<View>(R.id.manufacturerFilterLayout).isVisible = showManufacturer
+        view.findViewById<View>(R.id.availabilityFilterLayout).isVisible = showAvailability
+        view.findViewById<View>(R.id.rackFilterLayout).isVisible = showRack
+        view.findViewById<View>(R.id.shelfFilterLayout).isVisible = showShelf
+        view.findViewById<View>(R.id.topFilterRow).isVisible = showManufacturer || showAvailability
+        view.findViewById<View>(R.id.bottomFilterRow).isVisible = showRack || showShelf
+
         val adapter = ProductAdapter { product ->
             (requireActivity() as MainActivity).openProductDetails(product.id)
         }
@@ -166,6 +178,25 @@ class WarehouseFragment : Fragment() {
         manufacturerFilter.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) manufacturerFilter.showDropDown()
         }
+
+        val availabilityFilter = view.findViewById<MaterialAutoCompleteTextView>(R.id.availabilityFilter)
+        val availabilityLabels = listOf(
+            getString(R.string.all_availability),
+            getString(R.string.in_stock),
+            getString(R.string.out_of_stock),
+        )
+        availabilityFilter.setAdapter(
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, availabilityLabels),
+        )
+        availabilityFilter.setText(availabilityLabels.first(), false)
+        availabilityFilter.setOnItemClickListener { _, _, position, _ ->
+            viewModel.filterAvailability(position)
+        }
+
+        val rackFilter = view.findViewById<MaterialAutoCompleteTextView>(R.id.rackFilter)
+        val shelfFilter = view.findViewById<MaterialAutoCompleteTextView>(R.id.shelfFilter)
+        rackFilter.setText(getString(R.string.all_racks), false)
+        shelfFilter.setText(getString(R.string.all_shelves), false)
         view.findViewById<ExtendedFloatingActionButton>(R.id.addProductButton)
             .setOnClickListener { showAddProductDialog(view) }
         view.findViewById<View>(R.id.openArchiveButton).setOnClickListener {
@@ -201,6 +232,28 @@ class WarehouseFragment : Fragment() {
                         )
                         manufacturerFilter.setOnItemClickListener { _, _, position, _ ->
                             viewModel.filterManufacturer(manufacturers.getOrNull(position - 1)?.id)
+                        }
+                    }
+                }
+                launch {
+                    viewModel.locations.collect { locations ->
+                        val racks = locations.map { it.rack }.filter(String::isNotBlank)
+                            .distinct().sortedBy { it.lowercase() }
+                        val shelves = locations.map { it.shelf }.filter(String::isNotBlank)
+                            .distinct().sortedBy { it.lowercase() }
+                        val rackLabels = listOf(getString(R.string.all_racks)) + racks
+                        val shelfLabels = listOf(getString(R.string.all_shelves)) + shelves
+                        rackFilter.setAdapter(
+                            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, rackLabels),
+                        )
+                        shelfFilter.setAdapter(
+                            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, shelfLabels),
+                        )
+                        rackFilter.setOnItemClickListener { _, _, position, _ ->
+                            viewModel.filterRack(racks.getOrNull(position - 1).orEmpty())
+                        }
+                        shelfFilter.setOnItemClickListener { _, _, position, _ ->
+                            viewModel.filterShelf(shelves.getOrNull(position - 1).orEmpty())
                         }
                     }
                 }

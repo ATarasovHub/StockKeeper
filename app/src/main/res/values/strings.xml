@@ -92,6 +92,14 @@
     <string name="product_restored">Product restored</string>
     <string name="manufacturer_filter">Manufacturer</string>
     <string name="all_manufacturers">All manufacturers</string>
+    <string name="availability_filter">Availability</string>
+    <string name="all_availability">All stock</string>
+    <string name="in_stock">In stock</string>
+    <string name="out_of_stock">Out of stock</string>
+    <string name="all_racks">All racks</string>
+    <string name="all_shelves">All shelves</string>
+    <string name="warehouse_filters">Warehouse filters</string>
+    <string name="warehouse_filters_description">Choose which filters are shown above the product list.</string>
     <string name="recent_searches">Recent searches</string>
     <string name="directories">Directories (Beta)</string>
     <string name="manufacturers">Makers</string>

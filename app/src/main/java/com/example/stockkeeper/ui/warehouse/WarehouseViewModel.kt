@@ -25,6 +25,9 @@ class WarehouseViewModel(
 ) : ViewModel() {
     private val query = MutableStateFlow("")
     private val manufacturerId = MutableStateFlow<Long?>(null)
+    private val rack = MutableStateFlow("")
+    private val shelf = MutableStateFlow("")
+    private val availability = MutableStateFlow(0)
     private val manufacturerQuery = MutableStateFlow("")
     private val productFormManufacturerQuery = MutableStateFlow("")
     val messages = MutableSharedFlow<Result<Unit>>()
@@ -32,9 +35,20 @@ class WarehouseViewModel(
     val products: StateFlow<List<ProductStockItem>> = combine(
         query.debounce(200),
         manufacturerId,
-    ) { searchQuery, selectedManufacturer -> searchQuery to selectedManufacturer }
-        .flatMapLatest { (searchQuery, selectedManufacturer) ->
-            repository.observeStock(searchQuery, selectedManufacturer)
+        rack,
+        shelf,
+        availability,
+    ) { searchQuery, selectedManufacturer, selectedRack, selectedShelf, selectedAvailability ->
+        StockFilters(searchQuery, selectedManufacturer, selectedRack, selectedShelf, selectedAvailability)
+    }
+        .flatMapLatest { filters ->
+            repository.observeStock(
+                filters.query,
+                filters.manufacturerId,
+                filters.rack,
+                filters.shelf,
+                filters.availability,
+            )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -67,6 +81,18 @@ class WarehouseViewModel(
 
     fun filterManufacturer(id: Long?) {
         manufacturerId.value = id
+    }
+
+    fun filterRack(value: String) {
+        rack.value = value
+    }
+
+    fun filterShelf(value: String) {
+        shelf.value = value
+    }
+
+    fun filterAvailability(value: Int) {
+        availability.value = value
     }
 
     fun searchManufacturers(value: String) {
@@ -119,3 +145,11 @@ class WarehouseViewModel(
         }
     }
 }
+
+private data class StockFilters(
+    val query: String,
+    val manufacturerId: Long?,
+    val rack: String,
+    val shelf: String,
+    val availability: Int,
+)

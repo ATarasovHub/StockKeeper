@@ -16,6 +16,7 @@ import com.example.stockkeeper.settings.AppSettings
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -87,6 +88,36 @@ class SettingsFragment : Fragment() {
             }
             AppSettings.setTheme(requireContext(), theme)
         }
+
+        bindFilterSwitch(
+            view.findViewById(R.id.manufacturerFilterSwitch),
+            AppSettings.showManufacturerFilter(requireContext()),
+            AppSettings::setShowManufacturerFilter,
+        )
+        bindFilterSwitch(
+            view.findViewById(R.id.availabilityFilterSwitch),
+            AppSettings.showAvailabilityFilter(requireContext()),
+            AppSettings::setShowAvailabilityFilter,
+        )
+        bindFilterSwitch(
+            view.findViewById(R.id.rackFilterSwitch),
+            AppSettings.showRackFilter(requireContext()),
+            AppSettings::setShowRackFilter,
+        )
+        bindFilterSwitch(
+            view.findViewById(R.id.shelfFilterSwitch),
+            AppSettings.showShelfFilter(requireContext()),
+            AppSettings::setShowShelfFilter,
+        )
+    }
+
+    private fun bindFilterSwitch(
+        switch: MaterialSwitch,
+        checked: Boolean,
+        save: (android.content.Context, Boolean) -> Unit,
+    ) {
+        switch.isChecked = checked
+        switch.setOnCheckedChangeListener { _, isChecked -> save(requireContext(), isChecked) }
     }
 
     private fun exportBackup(uri: android.net.Uri) {
