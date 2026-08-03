@@ -35,7 +35,8 @@ abstract class StockKeeperDatabase : RoomDatabase() {
     abstract fun stockTransactionDao(): StockTransactionDao
 
     companion object {
-        private const val DATABASE_NAME = "stockkeeper.db"
+        const val DATABASE_NAME = "stockkeeper.db"
+        const val DATABASE_VERSION = 1
 
         @Volatile
         private var instance: StockKeeperDatabase? = null
@@ -48,5 +49,10 @@ abstract class StockKeeperDatabase : RoomDatabase() {
                     DATABASE_NAME,
                 ).build().also { instance = it }
             }
+
+        fun closeInstance() = synchronized(this) {
+            instance?.close()
+            instance = null
+        }
     }
 }

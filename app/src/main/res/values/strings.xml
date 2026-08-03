@@ -39,7 +39,14 @@
     <string name="dark_theme">Dark</string>
     <string name="data_section">Data</string>
     <string name="backup_title">Backup and transfer</string>
-    <string name="backup_coming_soon">Export and import will be added in the next stage.</string>
+    <string name="backup_description">Save the database and product photos to one ZIP file, or restore them on another device.</string>
+    <string name="export_data">Export backup</string>
+    <string name="import_data">Import backup</string>
+    <string name="export_success">Backup exported</string>
+    <string name="import_success">Backup imported</string>
+    <string name="backup_failed">Backup operation failed: %1$s</string>
+    <string name="import_confirm_title">Replace current data?</string>
+    <string name="import_confirm_message">Products, history, and photos in the app will be replaced with data from this backup. A local safety copy will be created first.</string>
     <string name="about">About</string>
     <string name="about_text">Offline warehouse inventory · Database version 1</string>
     <string name="operation_sale">Sale</string>

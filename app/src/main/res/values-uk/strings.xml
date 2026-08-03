@@ -39,7 +39,6 @@
     <string name="dark_theme">Темна</string>
     <string name="data_section">Дані</string>
     <string name="backup_title">Резервна копія та перенесення</string>
-    <string name="backup_coming_soon">Експорт та імпорт буде додано на наступному етапі.</string>
     <string name="about">Про застосунок</string>
     <string name="about_text">Офлайн-облік складу · Версія бази 1</string>
     <string name="operation_sale">Продаж</string>
@@ -86,4 +85,12 @@
     <string name="manufacturer_filter">Виробник</string>
     <string name="all_manufacturers">Усі виробники</string>
     <string name="recent_searches">Останні пошуки</string>
+    <string name="backup_description">Збережіть базу даних і фото товарів в одному ZIP-файлі або відновіть їх на іншому пристрої.</string>
+    <string name="export_data">Експортувати копію</string>
+    <string name="import_data">Імпортувати копію</string>
+    <string name="export_success">Резервну копію експортовано</string>
+    <string name="import_success">Резервну копію імпортовано</string>
+    <string name="backup_failed">Помилка резервної копії: %1$s</string>
+    <string name="import_confirm_title">Замінити поточні дані?</string>
+    <string name="import_confirm_message">Товари, історія та фото у застосунку будуть замінені даними з цієї копії. Спочатку буде створено локальну страхувальну копію.</string>
 </resources>

@@ -11,11 +11,25 @@ class StockKeeperApplication : Application() {
         AppSettings.apply(this)
     }
 
-    val database: StockKeeperDatabase by lazy {
-        StockKeeperDatabase.getInstance(this)
-    }
+    @Volatile
+    private var databaseInstance: StockKeeperDatabase? = null
 
-    val stockRepository: StockRepository by lazy {
-        StockRepository(database)
+    @Volatile
+    private var repositoryInstance: StockRepository? = null
+
+    val database: StockKeeperDatabase
+        get() = databaseInstance ?: synchronized(this) {
+            databaseInstance ?: StockKeeperDatabase.getInstance(this).also { databaseInstance = it }
+        }
+
+    val stockRepository: StockRepository
+        get() = repositoryInstance ?: synchronized(this) {
+            repositoryInstance ?: StockRepository(database).also { repositoryInstance = it }
+        }
+
+    fun closeDatabase() = synchronized(this) {
+        repositoryInstance = null
+        StockKeeperDatabase.closeInstance()
+        databaseInstance = null
     }
 }
