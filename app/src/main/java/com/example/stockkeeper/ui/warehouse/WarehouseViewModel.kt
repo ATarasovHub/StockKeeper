@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockkeeper.data.local.model.ProductStockItem
 import com.example.stockkeeper.data.local.entity.ManufacturerEntity
+import com.example.stockkeeper.data.local.entity.StorageLocationEntity
+import com.example.stockkeeper.data.local.entity.CustomerEntity
 import com.example.stockkeeper.data.repository.StockRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,7 @@ class WarehouseViewModel(
     private val query = MutableStateFlow("")
     private val manufacturerId = MutableStateFlow<Long?>(null)
     private val manufacturerQuery = MutableStateFlow("")
+    private val productFormManufacturerQuery = MutableStateFlow("")
     val messages = MutableSharedFlow<Result<Unit>>()
 
     val products: StateFlow<List<ProductStockItem>> = combine(
@@ -42,6 +45,21 @@ class WarehouseViewModel(
         .debounce(200)
         .flatMapLatest { repository.searchManufacturers(it, limit = 50) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val productFormManufacturerSuggestions: StateFlow<List<ManufacturerEntity>> = productFormManufacturerQuery
+        .debounce(200)
+        .flatMapLatest { repository.searchManufacturers(it, limit = 20) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val locations: StateFlow<List<StorageLocationEntity>> = repository.observeLocations()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val customers: StateFlow<List<CustomerEntity>> = repository.observeCustomers()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun searchProductFormManufacturers(value: String) {
+        productFormManufacturerQuery.value = value
+    }
 
     fun search(value: String) {
         query.value = value

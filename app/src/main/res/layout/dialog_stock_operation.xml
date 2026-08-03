@@ -4,7 +4,7 @@
         <com.google.android.material.textfield.TextInputEditText android:id="@+id/operationQuantityInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout android:id="@+id/customerLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="@string/customer">
-        <com.google.android.material.textfield.TextInputEditText android:id="@+id/customerInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapWords" android:maxLines="1" />
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/customerInput" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:completionThreshold="0" android:inputType="textCapWords" android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout android:id="@+id/reasonLayout" style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="@string/reason">
         <com.google.android.material.textfield.TextInputEditText android:id="@+id/reasonInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapSentences" android:maxLines="2" />

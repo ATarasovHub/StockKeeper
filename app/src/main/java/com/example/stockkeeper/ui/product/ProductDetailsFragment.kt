@@ -26,6 +26,8 @@ import com.example.stockkeeper.R
 import com.example.stockkeeper.StockKeeperApplication
 import com.example.stockkeeper.data.local.model.ProductStockItem
 import com.example.stockkeeper.data.photo.ProductPhotoStore
+import com.example.stockkeeper.ui.common.bindDirectorySuggestions
+import com.example.stockkeeper.ui.common.bindCustomerSuggestions
 import com.example.stockkeeper.ui.history.HistoryAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -183,13 +185,19 @@ class ProductDetailsFragment : Fragment() {
         val content = layoutInflater.inflate(R.layout.dialog_add_product, null)
         content.findViewById<TextInputEditText>(R.id.articleInput).setText(product.article)
         content.findViewById<TextInputEditText>(R.id.nameInput).setText(product.name)
-        content.findViewById<TextInputEditText>(R.id.manufacturerInput).setText(product.manufacturerName)
-        content.findViewById<TextInputEditText>(R.id.rackInput).setText(product.rack)
-        content.findViewById<TextInputEditText>(R.id.shelfInput).setText(product.shelf)
+        content.findViewById<TextView>(R.id.manufacturerInput).text = product.manufacturerName
+        content.findViewById<TextView>(R.id.rackInput).text = product.rack
+        content.findViewById<TextView>(R.id.shelfInput).text = product.shelf
         content.findViewById<TextInputEditText>(R.id.noteInput).setText(product.note)
         content.findViewById<View>(R.id.addProductPhoto).isVisible = false
         content.findViewById<View>(R.id.addProductPhotoButton).isVisible = false
         content.findViewById<TextInputLayout>(R.id.quantityLayout).isVisible = false
+        val suggestionsJob = bindDirectorySuggestions(
+            content = content,
+            manufacturerSuggestions = viewModel.manufacturerSuggestions,
+            locations = viewModel.locations,
+            onManufacturerQueryChanged = viewModel::searchManufacturers,
+        )
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.edit)
             .setView(content)
@@ -217,6 +225,10 @@ class ProductDetailsFragment : Fragment() {
                 dialog.dismiss()
             }
         }
+        dialog.setOnDismissListener {
+            suggestionsJob.cancel()
+            viewModel.searchManufacturers("")
+        }
         dialog.show()
     }
 
@@ -226,6 +238,11 @@ class ProductDetailsFragment : Fragment() {
         val reasonLayout = content.findViewById<TextInputLayout>(R.id.reasonLayout)
         customerLayout.isVisible = operation == 1
         reasonLayout.isVisible = operation == 2
+        val customerSuggestionsJob = if (operation == 1) {
+            bindCustomerSuggestions(content, viewModel.customers)
+        } else {
+            null
+        }
         val title = when (operation) {
             0 -> R.string.receive
             1 -> R.string.sell
@@ -255,6 +272,7 @@ class ProductDetailsFragment : Fragment() {
                 dialog.dismiss()
             }
         }
+        dialog.setOnDismissListener { customerSuggestionsJob?.cancel() }
         dialog.show()
     }
 
@@ -284,7 +302,7 @@ class ProductDetailsFragment : Fragment() {
     }
 
     private fun View.text(id: Int): String =
-        findViewById<TextInputEditText>(id).text?.toString()?.trim().orEmpty()
+        findViewById<TextView>(id).text?.toString()?.trim().orEmpty()
 
     companion object {
         private const val ARG_PRODUCT_ID = "product_id"

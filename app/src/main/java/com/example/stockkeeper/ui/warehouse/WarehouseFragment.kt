@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.view.inputmethod.EditorInfo
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
@@ -28,13 +29,14 @@ import com.example.stockkeeper.R
 import com.example.stockkeeper.MainActivity
 import com.example.stockkeeper.StockKeeperApplication
 import com.example.stockkeeper.ui.common.StockViewModelFactory
+import com.example.stockkeeper.ui.common.bindDirectorySuggestions
+import com.example.stockkeeper.ui.common.bindCustomerSuggestions
 import com.example.stockkeeper.data.local.model.ProductStockItem
 import com.example.stockkeeper.data.photo.ProductPhotoStore
 import com.example.stockkeeper.search.SearchHistoryStore
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import kotlinx.coroutines.launch
@@ -239,6 +241,11 @@ class WarehouseFragment : Fragment() {
         val reasonLayout = content.findViewById<TextInputLayout>(R.id.reasonLayout)
         customerLayout.isVisible = operation == 1
         reasonLayout.isVisible = operation == 2
+        val customerSuggestionsJob = if (operation == 1) {
+            bindCustomerSuggestions(content, viewModel.customers)
+        } else {
+            null
+        }
         val title = when (operation) {
             0 -> R.string.receive
             1 -> R.string.sell
@@ -270,6 +277,7 @@ class WarehouseFragment : Fragment() {
                 dialog.dismiss()
             }
         }
+        dialog.setOnDismissListener { customerSuggestionsJob?.cancel() }
         dialog.show()
     }
 
@@ -281,6 +289,12 @@ class WarehouseFragment : Fragment() {
         content.findViewById<View>(R.id.addProductPhotoButton).setOnClickListener {
             showPhotoSource()
         }
+        val suggestionsJob = bindDirectorySuggestions(
+            content = content,
+            manufacturerSuggestions = viewModel.productFormManufacturerSuggestions,
+            locations = viewModel.locations,
+            onManufacturerQueryChanged = viewModel::searchProductFormManufacturers,
+        )
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_product)
             .setView(content)
@@ -317,6 +331,8 @@ class WarehouseFragment : Fragment() {
             }
         }
         dialog.setOnDismissListener {
+            suggestionsJob.cancel()
+            viewModel.searchProductFormManufacturers("")
             if (!photoCommitted) ProductPhotoStore.delete(requireContext(), selectedPhotoPath)
             addDialogContent = null
             selectedPhotoPath = null
@@ -325,7 +341,7 @@ class WarehouseFragment : Fragment() {
     }
 
     private fun View.text(id: Int): String =
-        findViewById<TextInputEditText>(id).text?.toString()?.trim().orEmpty()
+        findViewById<TextView>(id).text?.toString()?.trim().orEmpty()
 
     private fun showPhotoSource() {
         MaterialAlertDialogBuilder(requireContext())
