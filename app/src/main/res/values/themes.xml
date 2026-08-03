@@ -13,4 +13,9 @@
     </style>
 
     <style name="Theme.StockKeeper" parent="Base.Theme.StockKeeper" />
+
+    <style name="ShapeAppearance.StockKeeper.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

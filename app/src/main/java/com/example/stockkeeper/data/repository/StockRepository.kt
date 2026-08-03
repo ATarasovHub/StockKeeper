@@ -25,11 +25,23 @@ class StockRepository(
         manufacturerId: Long? = null,
     ): Flow<List<ProductStockItem>> = productDao.observeStock(query.trim(), manufacturerId)
 
+    fun observeManufacturers(): Flow<List<ManufacturerEntity>> =
+        directoryDao.observeManufacturers()
+
+    fun searchManufacturers(query: String, limit: Int = 50): Flow<List<ManufacturerEntity>> =
+        directoryDao.searchManufacturers(query.trim(), limit)
+
     fun observeProductHistory(productId: Long): Flow<List<StockTransactionDetails>> =
         transactionDao.observeProductHistory(productId)
 
+    fun observeProduct(productId: Long): Flow<ProductStockItem?> =
+        productDao.observeProduct(productId)
+
     fun observeOutgoingHistory(): Flow<List<StockTransactionDetails>> =
         transactionDao.observeOutgoingHistory()
+
+    fun observeArchivedStock(query: String = ""): Flow<List<ProductStockItem>> =
+        productDao.observeArchivedStock(query.trim())
 
     suspend fun createProduct(
         article: String,
@@ -81,6 +93,7 @@ class StockRepository(
     suspend fun createProductFromForm(
         article: String,
         name: String,
+        photoPath: String? = null,
         manufacturerName: String?,
         rack: String?,
         shelf: String?,
@@ -107,11 +120,67 @@ class StockRepository(
         createProduct(
             article = article,
             name = name,
+            photoPath = photoPath,
             manufacturerId = manufacturerId,
             locationId = locationId,
             note = note,
             initialQuantity = initialQuantity,
         )
+    }
+
+    suspend fun updateProduct(
+        productId: Long,
+        article: String,
+        name: String,
+        manufacturerName: String?,
+        rack: String?,
+        shelf: String?,
+        note: String?,
+        photoPath: String?,
+    ) = database.withTransaction {
+        val current = requireNotNull(productDao.findById(productId)) { "Product $productId does not exist" }
+        val cleanArticle = article.trim()
+        val cleanName = name.trim()
+        require(cleanArticle.isNotEmpty()) { "Article is required" }
+        require(cleanName.isNotEmpty()) { "Product name is required" }
+        val duplicate = productDao.findByArticle(cleanArticle)
+        require(duplicate == null || duplicate.id == productId) {
+            "A product with article '$cleanArticle' already exists"
+        }
+
+        val cleanManufacturer = manufacturerName?.trim().orEmpty()
+        val manufacturerId = cleanManufacturer.takeIf(String::isNotEmpty)?.let { value ->
+            directoryDao.findManufacturerByName(value)?.id
+                ?: directoryDao.insertManufacturer(ManufacturerEntity(name = value))
+        }
+        val cleanRack = rack?.trim().orEmpty()
+        val cleanShelf = shelf?.trim().orEmpty()
+        val locationId = if (cleanRack.isNotEmpty() || cleanShelf.isNotEmpty()) {
+            directoryDao.findLocation(cleanRack, cleanShelf)?.id
+                ?: directoryDao.insertLocation(StorageLocationEntity(rack = cleanRack, shelf = cleanShelf))
+        } else null
+
+        productDao.update(
+            current.copy(
+                article = cleanArticle,
+                name = cleanName,
+                manufacturerId = manufacturerId,
+                locationId = locationId,
+                note = note?.trim()?.takeIf(String::isNotEmpty),
+                photoPath = photoPath,
+                updatedAt = currentTimeMillis(),
+            ),
+        )
+    }
+
+    suspend fun archiveProduct(productId: Long) = database.withTransaction {
+        val current = requireNotNull(productDao.findById(productId)) { "Product $productId does not exist" }
+        productDao.update(current.copy(isArchived = true, updatedAt = currentTimeMillis()))
+    }
+
+    suspend fun restoreProduct(productId: Long) = database.withTransaction {
+        val current = requireNotNull(productDao.findById(productId)) { "Product $productId does not exist" }
+        productDao.update(current.copy(isArchived = false, updatedAt = currentTimeMillis()))
     }
 
     suspend fun receive(

@@ -7,13 +7,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.stockkeeper.ui.history.HistoryFragment
+import com.example.stockkeeper.ui.archive.ArchiveFragment
+import com.example.stockkeeper.ui.product.ProductDetailsFragment
 import com.example.stockkeeper.ui.settings.SettingsFragment
 import com.example.stockkeeper.ui.warehouse.WarehouseFragment
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
+    private lateinit var bottomNavigation: NavigationBarView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +30,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         toolbar = findViewById(R.id.topAppBar)
-        val navigation = findViewById<BottomNavigationView>(R.id.bottomNavigation)
-        navigation.setOnItemSelectedListener { item ->
+        bottomNavigation = findViewById(R.id.bottomNavigation)
+        bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_warehouse -> show(WarehouseFragment(), R.string.warehouse)
                 R.id.navigation_history -> show(HistoryFragment(), R.string.history)
@@ -36,18 +39,51 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (supportFragmentManager.backStackEntryCount == 0) {
+                toolbar.navigationIcon = null
+                toolbar.setNavigationOnClickListener(null)
+                toolbar.setTitle(R.string.warehouse)
+                bottomNavigation.visibility = android.view.View.VISIBLE
+            }
+        }
 
         if (savedInstanceState == null) {
-            navigation.selectedItemId = R.id.navigation_warehouse
+            bottomNavigation.selectedItemId = R.id.navigation_warehouse
         }
     }
 
     private fun show(fragment: Fragment, title: Int): Boolean {
+        bottomNavigation.visibility = android.view.View.VISIBLE
+        toolbar.navigationIcon = null
+        toolbar.setNavigationOnClickListener(null)
         toolbar.setTitle(title)
         supportFragmentManager.beginTransaction()
             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
             .replace(R.id.fragmentContainer, fragment)
             .commit()
         return true
+    }
+
+    fun openProductDetails(productId: Long) {
+        toolbar.setTitle(R.string.product_details)
+        toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+        toolbar.setNavigationOnClickListener { supportFragmentManager.popBackStack() }
+        bottomNavigation.visibility = android.view.View.GONE
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, ProductDetailsFragment.newInstance(productId))
+            .addToBackStack("product_details")
+            .commit()
+    }
+
+    fun openArchive() {
+        toolbar.setTitle(R.string.archive_title)
+        toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+        toolbar.setNavigationOnClickListener { supportFragmentManager.popBackStack() }
+        bottomNavigation.visibility = android.view.View.GONE
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, ArchiveFragment())
+            .addToBackStack("archive")
+            .commit()
     }
 }

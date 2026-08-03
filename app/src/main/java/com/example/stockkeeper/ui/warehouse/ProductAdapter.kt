@@ -4,11 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.ImageView
+import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.stockkeeper.R
 import com.example.stockkeeper.data.local.model.ProductStockItem
+import com.example.stockkeeper.data.photo.ProductPhotoStore
 
 class ProductAdapter(
     private val onClick: (ProductStockItem) -> Unit,
@@ -22,6 +26,7 @@ class ProductAdapter(
 
     class ProductHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val initial: TextView = view.findViewById(R.id.productInitial)
+        private val photo: ImageView = view.findViewById(R.id.productPhotoThumbnail)
         private val name: TextView = view.findViewById(R.id.productName)
         private val article: TextView = view.findViewById(R.id.productArticle)
         private val meta: TextView = view.findViewById(R.id.productMeta)
@@ -30,6 +35,14 @@ class ProductAdapter(
         fun bind(item: ProductStockItem, onClick: (ProductStockItem) -> Unit) {
             val context = itemView.context
             initial.text = item.name.firstOrNull()?.uppercase() ?: "?"
+            val photoFile = ProductPhotoStore.file(context, item.photoPath)
+            photo.isVisible = photoFile != null
+            initial.isVisible = photoFile == null
+            if (photoFile != null) {
+                photo.setImageURI(photoFile.toUri())
+            } else {
+                photo.setImageDrawable(null)
+            }
             name.text = item.name
             article.text = context.getString(R.string.article_format, item.article)
             val manufacturer = item.manufacturerName ?: context.getString(R.string.manufacturer_not_set)

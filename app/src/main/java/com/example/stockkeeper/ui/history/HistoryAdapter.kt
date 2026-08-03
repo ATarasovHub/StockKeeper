@@ -22,9 +22,12 @@ class HistoryAdapter : ListAdapter<StockTransactionDetails, HistoryAdapter.Holde
 
     class Holder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: StockTransactionDetails) = with(itemView.context) {
-            itemView.findViewById<TextView>(R.id.operationType).setText(
-                if (item.type == StockTransactionType.SALE) R.string.operation_sale else R.string.operation_write_off,
-            )
+            itemView.findViewById<TextView>(R.id.operationType).setText(when (item.type) {
+                StockTransactionType.RECEIPT -> R.string.operation_receipt
+                StockTransactionType.SALE -> R.string.operation_sale
+                StockTransactionType.WRITE_OFF -> R.string.operation_write_off
+                StockTransactionType.ADJUSTMENT -> R.string.operation_adjustment
+            })
             itemView.findViewById<TextView>(R.id.operationQuantity).text =
                 getString(R.string.operation_quantity_format, item.quantityDelta)
             itemView.findViewById<TextView>(R.id.productName).text =
@@ -34,10 +37,11 @@ class HistoryAdapter : ListAdapter<StockTransactionDetails, HistoryAdapter.Holde
                     R.string.customer_format,
                     item.customerName ?: getString(R.string.unknown_customer),
                 )
-                else -> getString(
+                StockTransactionType.WRITE_OFF -> getString(
                     R.string.reason_format,
                     item.reason ?: getString(R.string.unknown_reason),
                 )
+                else -> item.reason?.let { getString(R.string.note_format, it) }.orEmpty()
             }
             itemView.findViewById<TextView>(R.id.operationDate).text =
                 DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(item.occurredAt))

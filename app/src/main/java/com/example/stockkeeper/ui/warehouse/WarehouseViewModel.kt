@@ -3,6 +3,7 @@ package com.example.stockkeeper.ui.warehouse
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockkeeper.data.local.model.ProductStockItem
+import com.example.stockkeeper.data.local.entity.ManufacturerEntity
 import com.example.stockkeeper.data.repository.StockRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -20,20 +22,43 @@ class WarehouseViewModel(
     private val repository: StockRepository,
 ) : ViewModel() {
     private val query = MutableStateFlow("")
+    private val manufacturerId = MutableStateFlow<Long?>(null)
+    private val manufacturerQuery = MutableStateFlow("")
     val messages = MutableSharedFlow<Result<Unit>>()
 
-    val products: StateFlow<List<ProductStockItem>> = query
+    val products: StateFlow<List<ProductStockItem>> = combine(
+        query.debounce(200),
+        manufacturerId,
+    ) { searchQuery, selectedManufacturer -> searchQuery to selectedManufacturer }
+        .flatMapLatest { (searchQuery, selectedManufacturer) ->
+            repository.observeStock(searchQuery, selectedManufacturer)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val allProducts: StateFlow<List<ProductStockItem>> = repository.observeStock()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val manufacturerSuggestions: StateFlow<List<ManufacturerEntity>> = manufacturerQuery
         .debounce(200)
-        .flatMapLatest(repository::observeStock)
+        .flatMapLatest { repository.searchManufacturers(it, limit = 50) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun search(value: String) {
         query.value = value
     }
 
+    fun filterManufacturer(id: Long?) {
+        manufacturerId.value = id
+    }
+
+    fun searchManufacturers(value: String) {
+        manufacturerQuery.value = value
+    }
+
     fun addProduct(
         article: String,
         name: String,
+        photoPath: String?,
         manufacturer: String?,
         rack: String?,
         shelf: String?,
@@ -46,6 +71,7 @@ class WarehouseViewModel(
                     repository.createProductFromForm(
                         article = article,
                         name = name,
+                        photoPath = photoPath,
                         manufacturerName = manufacturer,
                         rack = rack,
                         shelf = shelf,

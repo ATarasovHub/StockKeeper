@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="14dp">
+
+    <TextView
+        android:id="@+id/suggestionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+    <ImageView
+        android:id="@+id/recentSearchIcon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:contentDescription="@string/recent_searches"
+        android:src="@drawable/ic_recent_search"
+        app:tint="?attr/colorOnSurface" />
+</LinearLayout>

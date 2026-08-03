@@ -43,7 +43,8 @@ interface ProductDao {
         LEFT JOIN stock_transactions t ON t.product_id = p.id
         WHERE p.is_archived = 0
           AND (:query = '' OR p.article LIKE '%' || :query || '%' COLLATE NOCASE
-               OR p.name LIKE '%' || :query || '%' COLLATE NOCASE)
+               OR p.name LIKE '%' || :query || '%' COLLATE NOCASE
+               OR m.name LIKE '%' || :query || '%' COLLATE NOCASE)
           AND (:manufacturerId IS NULL OR p.manufacturer_id = :manufacturerId)
         GROUP BY p.id
         ORDER BY p.name COLLATE NOCASE, p.article COLLATE NOCASE
@@ -53,4 +54,57 @@ interface ProductDao {
         query: String = "",
         manufacturerId: Long? = null,
     ): Flow<List<ProductStockItem>>
+
+    @Query(
+        """
+        SELECT
+            p.id,
+            p.article,
+            p.name,
+            p.photo_path AS photoPath,
+            p.manufacturer_id AS manufacturerId,
+            m.name AS manufacturerName,
+            p.location_id AS locationId,
+            l.label AS locationLabel,
+            l.rack,
+            l.shelf,
+            p.note,
+            CAST(COALESCE(SUM(t.quantity_delta), 0) AS INTEGER) AS quantity
+        FROM products p
+        LEFT JOIN manufacturers m ON m.id = p.manufacturer_id
+        LEFT JOIN storage_locations l ON l.id = p.location_id
+        LEFT JOIN stock_transactions t ON t.product_id = p.id
+        WHERE p.id = :productId
+        GROUP BY p.id
+        """,
+    )
+    fun observeProduct(productId: Long): Flow<ProductStockItem?>
+
+    @Query(
+        """
+        SELECT
+            p.id,
+            p.article,
+            p.name,
+            p.photo_path AS photoPath,
+            p.manufacturer_id AS manufacturerId,
+            m.name AS manufacturerName,
+            p.location_id AS locationId,
+            l.label AS locationLabel,
+            l.rack,
+            l.shelf,
+            p.note,
+            CAST(COALESCE(SUM(t.quantity_delta), 0) AS INTEGER) AS quantity
+        FROM products p
+        LEFT JOIN manufacturers m ON m.id = p.manufacturer_id
+        LEFT JOIN storage_locations l ON l.id = p.location_id
+        LEFT JOIN stock_transactions t ON t.product_id = p.id
+        WHERE p.is_archived = 1
+          AND (:query = '' OR p.article LIKE '%' || :query || '%' COLLATE NOCASE
+               OR p.name LIKE '%' || :query || '%' COLLATE NOCASE)
+        GROUP BY p.id
+        ORDER BY p.name COLLATE NOCASE, p.article COLLATE NOCASE
+        """,
+    )
+    fun observeArchivedStock(query: String = ""): Flow<List<ProductStockItem>>
 }

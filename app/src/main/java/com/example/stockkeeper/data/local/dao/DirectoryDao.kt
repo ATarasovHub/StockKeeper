@@ -23,6 +23,16 @@ interface DirectoryDao {
     @Query("SELECT * FROM manufacturers ORDER BY name COLLATE NOCASE")
     fun observeManufacturers(): Flow<List<ManufacturerEntity>>
 
+    @Query(
+        """
+        SELECT * FROM manufacturers
+        WHERE :query = '' OR name LIKE :query || '%' COLLATE NOCASE
+        ORDER BY name COLLATE NOCASE
+        LIMIT :limit
+        """,
+    )
+    fun searchManufacturers(query: String, limit: Int = 50): Flow<List<ManufacturerEntity>>
+
     @Insert
     suspend fun insertLocation(location: StorageLocationEntity): Long
 
