@@ -1,11 +1,15 @@
 package com.example.stockkeeper.ui.warehouse
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.ArrayAdapter
 import android.view.inputmethod.EditorInfo
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import android.text.Editable
 import android.text.TextWatcher
@@ -38,6 +42,7 @@ import kotlinx.coroutines.launch
 class WarehouseFragment : Fragment() {
     private var addDialogContent: View? = null
     private var selectedPhotoPath: String? = null
+    private var pendingCameraPath: String? = null
 
     private val photoPicker = registerForActivityResult(PickVisualMedia()) { uri ->
         if (uri == null) return@registerForActivityResult
@@ -53,6 +58,24 @@ class WarehouseFragment : Fragment() {
                 .onFailure {
                     view?.let { anchor -> Snackbar.make(anchor, R.string.photo_failed, Snackbar.LENGTH_LONG).show() }
                 }
+        }
+    }
+    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { saved ->
+        val path = pendingCameraPath
+        pendingCameraPath = null
+        if (saved && path != null) {
+            ProductPhotoStore.delete(requireContext(), selectedPhotoPath)
+            selectedPhotoPath = path
+            ProductPhotoStore.file(requireContext(), path)?.let { file ->
+                addDialogContent?.findViewById<ImageView>(R.id.addProductPhoto)?.setImageURI(file.toUri())
+            }
+        } else {
+            ProductPhotoStore.delete(requireContext(), path)
+        }
+    }
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) launchCamera() else view?.let {
+            Snackbar.make(it, R.string.camera_permission_denied, Snackbar.LENGTH_LONG).show()
         }
     }
     private val viewModel: WarehouseViewModel by viewModels {
@@ -256,7 +279,7 @@ class WarehouseFragment : Fragment() {
         selectedPhotoPath = null
         var photoCommitted = false
         content.findViewById<View>(R.id.addProductPhotoButton).setOnClickListener {
-            photoPicker.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+            showPhotoSource()
         }
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_product)
@@ -303,4 +326,29 @@ class WarehouseFragment : Fragment() {
 
     private fun View.text(id: Int): String =
         findViewById<TextInputEditText>(id).text?.toString()?.trim().orEmpty()
+
+    private fun showPhotoSource() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.photo_source_title)
+            .setItems(arrayOf(getString(R.string.take_photo), getString(R.string.choose_gallery))) { _, choice ->
+                if (choice == 0) requestCamera() else photoPicker.launch(
+                    PickVisualMediaRequest(PickVisualMedia.ImageOnly),
+                )
+            }
+            .show()
+    }
+
+    private fun requestCamera() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            launchCamera()
+        } else {
+            cameraPermission.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    private fun launchCamera() {
+        val destination = ProductPhotoStore.createCameraDestination(requireContext())
+        pendingCameraPath = destination.relativePath
+        takePicture.launch(destination.uri)
+    }
 }

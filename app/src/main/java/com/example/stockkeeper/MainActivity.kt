@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.stockkeeper.ui.history.HistoryFragment
 import com.example.stockkeeper.ui.archive.ArchiveFragment
+import com.example.stockkeeper.ui.directories.DirectoriesFragment
 import com.example.stockkeeper.ui.product.ProductDetailsFragment
 import com.example.stockkeeper.ui.settings.SettingsFragment
 import com.example.stockkeeper.ui.warehouse.WarehouseFragment
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.navigation_warehouse -> show(WarehouseFragment(), R.string.warehouse)
                 R.id.navigation_history -> show(HistoryFragment(), R.string.history)
+                R.id.navigation_directories -> show(DirectoriesFragment(), R.string.directories)
                 R.id.navigation_settings -> show(SettingsFragment(), R.string.settings)
                 else -> false
             }

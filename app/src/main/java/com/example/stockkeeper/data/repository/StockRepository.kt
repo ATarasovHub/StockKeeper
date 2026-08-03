@@ -28,8 +28,50 @@ class StockRepository(
     fun observeManufacturers(): Flow<List<ManufacturerEntity>> =
         directoryDao.observeManufacturers()
 
+    fun observeCustomers(): Flow<List<CustomerEntity>> = directoryDao.observeCustomers()
+
+    fun observeLocations(): Flow<List<StorageLocationEntity>> = directoryDao.observeLocations()
+
     fun searchManufacturers(query: String, limit: Int = 50): Flow<List<ManufacturerEntity>> =
         directoryDao.searchManufacturers(query.trim(), limit)
+
+    suspend fun saveManufacturer(id: Long = 0, name: String, note: String?) {
+        val cleanName = name.trim()
+        require(cleanName.isNotEmpty()) { "Manufacturer name is required" }
+        val duplicate = directoryDao.findManufacturerByName(cleanName)
+        require(duplicate == null || duplicate.id == id) { "This manufacturer already exists" }
+        val value = ManufacturerEntity(id, cleanName, note.cleanOptional())
+        if (id == 0L) directoryDao.insertManufacturer(value) else directoryDao.updateManufacturer(value)
+    }
+
+    suspend fun saveCustomer(id: Long = 0, name: String, contactInfo: String?, note: String?) {
+        val cleanName = name.trim()
+        require(cleanName.isNotEmpty()) { "Customer name is required" }
+        val duplicate = directoryDao.findCustomerByName(cleanName)
+        require(duplicate == null || duplicate.id == id) { "This customer already exists" }
+        val value = CustomerEntity(id, cleanName, contactInfo.cleanOptional(), note.cleanOptional())
+        if (id == 0L) directoryDao.insertCustomer(value) else directoryDao.updateCustomer(value)
+    }
+
+    suspend fun saveLocation(id: Long = 0, rack: String, shelf: String, label: String?, note: String?) {
+        val cleanRack = rack.trim()
+        val cleanShelf = shelf.trim()
+        require(cleanRack.isNotEmpty()) { "Rack is required" }
+        require(cleanShelf.isNotEmpty()) { "Shelf is required" }
+        val duplicate = directoryDao.findLocation(cleanRack, cleanShelf)
+        require(duplicate == null || duplicate.id == id) { "This location already exists" }
+        val value = StorageLocationEntity(id, cleanRack, cleanShelf, label.cleanOptional(), note.cleanOptional())
+        if (id == 0L) directoryDao.insertLocation(value) else directoryDao.updateLocation(value)
+    }
+
+    suspend fun deleteManufacturer(value: ManufacturerEntity) = directoryDao.deleteManufacturer(value)
+
+    suspend fun deleteLocation(value: StorageLocationEntity) = directoryDao.deleteLocation(value)
+
+    suspend fun deleteCustomer(value: CustomerEntity) {
+        require(directoryDao.customerUsageCount(value.id) == 0) { "Customer is used in sales history" }
+        directoryDao.deleteCustomer(value)
+    }
 
     fun observeProductHistory(productId: Long): Flow<List<StockTransactionDetails>> =
         transactionDao.observeProductHistory(productId)
@@ -299,4 +341,6 @@ class StockRepository(
             createdAt = currentTimeMillis(),
         ),
     )
+
+    private fun String?.cleanOptional(): String? = this?.trim()?.takeIf(String::isNotEmpty)
 }

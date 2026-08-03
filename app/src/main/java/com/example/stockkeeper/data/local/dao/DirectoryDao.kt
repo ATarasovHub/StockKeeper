@@ -1,6 +1,7 @@
 package com.example.stockkeeper.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -23,6 +24,9 @@ interface DirectoryDao {
     @Query("SELECT * FROM manufacturers ORDER BY name COLLATE NOCASE")
     fun observeManufacturers(): Flow<List<ManufacturerEntity>>
 
+    @Delete
+    suspend fun deleteManufacturer(manufacturer: ManufacturerEntity)
+
     @Query(
         """
         SELECT * FROM manufacturers
@@ -42,6 +46,9 @@ interface DirectoryDao {
     @Query("SELECT * FROM storage_locations ORDER BY rack COLLATE NOCASE, shelf COLLATE NOCASE")
     fun observeLocations(): Flow<List<StorageLocationEntity>>
 
+    @Delete
+    suspend fun deleteLocation(location: StorageLocationEntity)
+
     @Query("SELECT * FROM storage_locations WHERE rack = :rack COLLATE NOCASE AND shelf = :shelf COLLATE NOCASE LIMIT 1")
     suspend fun findLocation(rack: String, shelf: String): StorageLocationEntity?
 
@@ -56,4 +63,10 @@ interface DirectoryDao {
 
     @Query("SELECT * FROM customers ORDER BY name COLLATE NOCASE")
     fun observeCustomers(): Flow<List<CustomerEntity>>
+
+    @Delete
+    suspend fun deleteCustomer(customer: CustomerEntity)
+
+    @Query("SELECT COUNT(*) FROM stock_transactions WHERE customer_id = :customerId")
+    suspend fun customerUsageCount(customerId: Long): Int
 }
