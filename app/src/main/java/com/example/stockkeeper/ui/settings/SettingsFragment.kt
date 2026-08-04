@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.stockkeeper.StockKeeperApplication
 import com.example.stockkeeper.R
 import com.example.stockkeeper.data.backup.BackupManager
+import com.example.stockkeeper.data.export.ExcelExportManager
 import com.example.stockkeeper.settings.AppSettings
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -26,6 +27,7 @@ import java.util.Locale
 class SettingsFragment : Fragment() {
     private lateinit var exportButton: MaterialButton
     private lateinit var importButton: MaterialButton
+    private lateinit var excelExportButton: MaterialButton
 
     private val exportLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         uri?.let { exportBackup(it) }
@@ -42,18 +44,27 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private val excelExportLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument(EXCEL_MIME_TYPE),
+    ) { uri -> uri?.let { exportExcel(it) } }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View =
         inflater.inflate(R.layout.fragment_settings, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         exportButton = view.findViewById(R.id.exportButton)
         importButton = view.findViewById(R.id.importButton)
+        excelExportButton = view.findViewById(R.id.excelExportButton)
         exportButton.setOnClickListener {
             val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
             exportLauncher.launch("stockkeeper-backup-$date.zip")
         }
         importButton.setOnClickListener {
             importLauncher.launch(arrayOf("application/zip", "application/octet-stream"))
+        }
+        excelExportButton.setOnClickListener {
+            val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US).format(Date())
+            excelExportLauncher.launch("stockkeeper-$date.xlsx")
         }
 
         val languageGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.languageGroup)
@@ -145,6 +156,22 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun exportExcel(uri: android.net.Uri) {
+        setBackupButtonsEnabled(false)
+        viewLifecycleOwner.lifecycleScope.launch {
+            runCatching {
+                ExcelExportManager(requireActivity().application as StockKeeperApplication).export(uri)
+            }.onSuccess {
+                view?.let { Snackbar.make(it, R.string.excel_export_success, Snackbar.LENGTH_LONG).show() }
+            }.onFailure { error ->
+                view?.let {
+                    Snackbar.make(it, getString(R.string.excel_export_failed, error.message.orEmpty()), Snackbar.LENGTH_LONG).show()
+                }
+            }
+            setBackupButtonsEnabled(true)
+        }
+    }
+
     private fun backupManager(): BackupManager = BackupManager(
         requireActivity().application as StockKeeperApplication,
     )
@@ -152,11 +179,16 @@ class SettingsFragment : Fragment() {
     private fun setBackupButtonsEnabled(enabled: Boolean) {
         exportButton.isEnabled = enabled
         importButton.isEnabled = enabled
+        excelExportButton.isEnabled = enabled
     }
 
     private fun showFailure(error: Throwable) {
         view?.let {
             Snackbar.make(it, getString(R.string.backup_failed, error.message.orEmpty()), Snackbar.LENGTH_LONG).show()
         }
+    }
+
+    private companion object {
+        const val EXCEL_MIME_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     }
 }

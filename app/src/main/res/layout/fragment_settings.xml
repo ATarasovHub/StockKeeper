@@ -22,6 +22,7 @@
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/backup_description" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/exportButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/export_data" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/importButton" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/import_data" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/excelExportButton" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/export_excel" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

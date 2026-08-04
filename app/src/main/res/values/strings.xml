@@ -47,6 +47,9 @@
     <string name="backup_failed">Backup operation failed: %1$s</string>
     <string name="import_confirm_title">Replace current data?</string>
     <string name="import_confirm_message">Products, history, and photos in the app will be replaced with data from this backup. A local safety copy will be created first.</string>
+    <string name="export_excel">Export database to Excel</string>
+    <string name="excel_export_success">Database exported to Excel</string>
+    <string name="excel_export_failed">Excel export failed: %1$s</string>
     <string name="about">About</string>
     <string name="about_text">Offline warehouse inventory · Database version 1</string>
     <string name="operation_sale">Sale</string>

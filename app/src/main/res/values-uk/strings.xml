@@ -93,6 +93,9 @@
     <string name="backup_failed">Помилка резервної копії: %1$s</string>
     <string name="import_confirm_title">Замінити поточні дані?</string>
     <string name="import_confirm_message">Товари, історія та фото у застосунку будуть замінені даними з цієї копії. Спочатку буде створено локальну страхувальну копію.</string>
+    <string name="export_excel">Експортувати базу в Excel</string>
+    <string name="excel_export_success">Базу експортовано в Excel</string>
+    <string name="excel_export_failed">Помилка експорту в Excel: %1$s</string>
     <string name="directories">Довідники (Бета)</string>
     <string name="manufacturers">Виробники</string>
     <string name="customers">Покупці</string>
