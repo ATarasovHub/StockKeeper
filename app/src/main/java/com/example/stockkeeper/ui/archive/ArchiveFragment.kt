@@ -37,6 +37,7 @@ class ArchiveFragment : Fragment() {
         val list = view.findViewById<RecyclerView>(R.id.archiveList)
         val empty = view.findViewById<View>(R.id.archiveEmptyState)
         list.layoutManager = LinearLayoutManager(requireContext())
+        list.setHasFixedSize(true)
         list.adapter = adapter
         view.findViewById<TextInputEditText>(R.id.archiveSearchInput).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit

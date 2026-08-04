@@ -13,7 +13,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -22,6 +21,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.dispose
+import coil.load
 import com.example.stockkeeper.R
 import com.example.stockkeeper.StockKeeperApplication
 import com.example.stockkeeper.data.local.model.ProductStockItem
@@ -118,8 +119,11 @@ class ProductDetailsFragment : Fragment() {
         val photo = view.findViewById<ImageView>(R.id.productPhoto)
         val file = ProductPhotoStore.file(requireContext(), product.photoPath)
         if (file != null) {
-            photo.setImageURI(file.toUri())
+            photo.load(file) {
+                crossfade(true)
+            }
         } else {
+            photo.dispose()
             photo.setImageResource(R.drawable.ic_inventory)
         }
     }

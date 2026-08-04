@@ -44,12 +44,17 @@ class HistoryAdapter : ListAdapter<StockTransactionDetails, HistoryAdapter.Holde
                 else -> item.reason?.let { getString(R.string.note_format, it) }.orEmpty()
             }
             itemView.findViewById<TextView>(R.id.operationDate).text =
-                DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(item.occurredAt))
+                dateFormat.format(Date(item.occurredAt))
         }
     }
 
     private object Diff : DiffUtil.ItemCallback<StockTransactionDetails>() {
         override fun areItemsTheSame(oldItem: StockTransactionDetails, newItem: StockTransactionDetails) = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: StockTransactionDetails, newItem: StockTransactionDetails) = oldItem == newItem
+    }
+
+    private companion object {
+        private val dateFormat: DateFormat =
+            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
     }
 }

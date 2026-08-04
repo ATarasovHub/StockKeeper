@@ -5,11 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.ImageView
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.dispose
+import coil.load
 import com.example.stockkeeper.R
 import com.example.stockkeeper.data.local.model.ProductStockItem
 import com.example.stockkeeper.data.photo.ProductPhotoStore
@@ -39,8 +40,11 @@ class ProductAdapter(
             photo.isVisible = photoFile != null
             initial.isVisible = photoFile == null
             if (photoFile != null) {
-                photo.setImageURI(photoFile.toUri())
+                photo.load(photoFile) {
+                    crossfade(true)
+                }
             } else {
+                photo.dispose()
                 photo.setImageDrawable(null)
             }
             name.text = item.name

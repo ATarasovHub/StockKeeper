@@ -31,6 +31,7 @@ class HistoryFragment : Fragment() {
         val list = view.findViewById<RecyclerView>(R.id.historyList)
         val empty = view.findViewById<View>(R.id.emptyState)
         list.layoutManager = LinearLayoutManager(requireContext())
+        list.setHasFixedSize(true)
         list.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {

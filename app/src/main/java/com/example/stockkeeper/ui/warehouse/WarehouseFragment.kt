@@ -111,6 +111,7 @@ class WarehouseFragment : Fragment() {
         val list = view.findViewById<RecyclerView>(R.id.productList)
         val empty = view.findViewById<View>(R.id.emptyState)
         list.layoutManager = LinearLayoutManager(requireContext())
+        list.setHasFixedSize(true)
         list.adapter = adapter
 
         val searchInput = view.findViewById<MaterialAutoCompleteTextView>(R.id.searchInput)
@@ -197,6 +198,8 @@ class WarehouseFragment : Fragment() {
         val shelfFilter = view.findViewById<MaterialAutoCompleteTextView>(R.id.shelfFilter)
         rackFilter.setText(getString(R.string.all_racks), false)
         shelfFilter.setText(getString(R.string.all_shelves), false)
+        rackFilter.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) rackFilter.showDropDown() }
+        shelfFilter.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) shelfFilter.showDropDown() }
         view.findViewById<ExtendedFloatingActionButton>(R.id.addProductButton)
             .setOnClickListener { showAddProductDialog(view) }
         view.findViewById<View>(R.id.openArchiveButton).setOnClickListener {
@@ -213,11 +216,8 @@ class WarehouseFragment : Fragment() {
                     }
                 }
                 launch {
-                    viewModel.allProducts.collect { products ->
-                        candidates = products
-                            .flatMap { listOf(it.article, it.name, it.manufacturerName.orEmpty()) }
-                            .filter(String::isNotBlank)
-                            .distinctBy { it.lowercase() }
+                    viewModel.searchCandidates.collect { values ->
+                        candidates = values
                         refreshSuggestions(searchInput.text?.toString().orEmpty(), openMenu = false)
                     }
                 }
@@ -249,11 +249,13 @@ class WarehouseFragment : Fragment() {
                         shelfFilter.setAdapter(
                             ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, shelfLabels),
                         )
-                        rackFilter.setOnItemClickListener { _, _, position, _ ->
-                            viewModel.filterRack(racks.getOrNull(position - 1).orEmpty())
+                        rackFilter.setOnItemClickListener { parent, _, position, _ ->
+                            val label = parent.getItemAtPosition(position) as? String
+                            viewModel.filterRack(if (label == rackLabels.first()) "" else label.orEmpty())
                         }
-                        shelfFilter.setOnItemClickListener { _, _, position, _ ->
-                            viewModel.filterShelf(shelves.getOrNull(position - 1).orEmpty())
+                        shelfFilter.setOnItemClickListener { parent, _, position, _ ->
+                            val label = parent.getItemAtPosition(position) as? String
+                            viewModel.filterShelf(if (label == shelfLabels.first()) "" else label.orEmpty())
                         }
                     }
                 }

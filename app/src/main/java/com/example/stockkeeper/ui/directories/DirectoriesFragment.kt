@@ -37,6 +37,7 @@ class DirectoriesFragment : Fragment() {
         val list = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.directoryList)
         val empty = view.findViewById<View>(R.id.directoryEmptyState)
         list.layoutManager = LinearLayoutManager(requireContext())
+        list.setHasFixedSize(true)
         list.adapter = adapter
 
         view.findViewById<MaterialButtonToggleGroup>(R.id.directoryTypeGroup)

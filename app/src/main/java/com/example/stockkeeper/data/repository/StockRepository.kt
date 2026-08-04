@@ -84,6 +84,9 @@ class StockRepository(
     fun observeProduct(productId: Long): Flow<ProductStockItem?> =
         productDao.observeProduct(productId)
 
+    fun observeSearchCandidates(): Flow<List<String>> =
+        productDao.observeSearchCandidates()
+
     fun observeOutgoingHistory(): Flow<List<StockTransactionDetails>> =
         transactionDao.observeOutgoingHistory()
 

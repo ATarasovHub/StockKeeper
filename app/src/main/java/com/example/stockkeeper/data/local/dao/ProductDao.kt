@@ -90,6 +90,20 @@ interface ProductDao {
 
     @Query(
         """
+        SELECT article AS value FROM products WHERE is_archived = 0 AND article <> ''
+        UNION
+        SELECT name AS value FROM products WHERE is_archived = 0 AND name <> ''
+        UNION
+        SELECT m.name AS value FROM manufacturers m
+        WHERE m.name <> '' AND EXISTS (
+            SELECT 1 FROM products p WHERE p.manufacturer_id = m.id AND p.is_archived = 0
+        )
+        """,
+    )
+    fun observeSearchCandidates(): Flow<List<String>>
+
+    @Query(
+        """
         SELECT
             p.id,
             p.article,
