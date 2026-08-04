@@ -66,6 +66,13 @@ class SettingsFragment : Fragment() {
             val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.US).format(Date())
             excelExportLauncher.launch("stockkeeper-$date.xlsx")
         }
+        view.findViewById<MaterialButton>(R.id.privacyPolicyButton).setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.privacy_policy)
+                .setMessage(R.string.privacy_policy_text)
+                .setPositiveButton(R.string.close, null)
+                .show()
+        }
 
         val languageGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.languageGroup)
         val languageButton = when (AppSettings.language(requireContext())) {

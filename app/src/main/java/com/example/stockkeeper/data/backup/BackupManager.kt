@@ -101,6 +101,20 @@ class BackupManager(private val application: StockKeeperApplication) {
                     "Database integrity check failed"
                 }
             }
+            database.rawQuery(
+                "SELECT identity_hash FROM room_master_table WHERE id = 42",
+                null,
+            ).use { cursor ->
+                require(cursor.moveToFirst() && cursor.getString(0) == ROOM_IDENTITY_HASH) {
+                    "Backup database schema does not match this app"
+                }
+            }
+            database.rawQuery("PRAGMA foreign_key_check", null).use { cursor ->
+                require(!cursor.moveToFirst()) { "Backup contains broken data relationships" }
+            }
+            database.rawQuery("SELECT photo_path FROM products WHERE photo_path IS NOT NULL", null).use { cursor ->
+                while (cursor.moveToNext()) requireSafePhotoPath(cursor.getString(0))
+            }
         } finally {
             database.close()
         }
@@ -110,10 +124,12 @@ class BackupManager(private val application: StockKeeperApplication) {
         val root = destination.canonicalFile
         var extractedBytes = 0L
         var entryCount = 0
+        val entryNames = mutableSetOf<String>()
         var entry = zip.nextEntry
         while (entry != null) {
             entryCount++
             require(entryCount <= MAX_ZIP_ENTRIES) { "Backup contains too many files" }
+            require(entryNames.add(entry.name)) { "Backup contains duplicate entries" }
             val target = File(root, entry.name).canonicalFile
             require(target.path.startsWith(root.path + File.separator)) { "Unsafe backup entry" }
             if (entry.isDirectory) {
@@ -133,6 +149,13 @@ class BackupManager(private val application: StockKeeperApplication) {
             }
             zip.closeEntry()
             entry = zip.nextEntry
+        }
+    }
+
+    private fun requireSafePhotoPath(relativePath: String) {
+        val normalized = File(relativePath).normalize().path.replace('\\', '/')
+        require(normalized.startsWith("$PHOTO_DIRECTORY/") && ".." !in normalized.split('/')) {
+            "Backup contains an unsafe photo path"
         }
     }
 
@@ -163,5 +186,6 @@ class BackupManager(private val application: StockKeeperApplication) {
         private const val SAFETY_DIRECTORY = "last_import_backup"
         private const val MAX_ZIP_ENTRIES = 10_000
         private const val MAX_EXTRACTED_BYTES = 1_073_741_824L
+        private const val ROOM_IDENTITY_HASH = "d7f8902c01d826a4536a78f1875d99a5"
     }
 }

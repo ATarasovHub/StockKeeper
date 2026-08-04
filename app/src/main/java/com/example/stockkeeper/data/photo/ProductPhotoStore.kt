@@ -27,13 +27,11 @@ object ProductPhotoStore {
         "$DIRECTORY/${destination.name}"
     }
 
-    fun file(context: Context, relativePath: String?): File? = relativePath
-        ?.takeIf(String::isNotBlank)
-        ?.let { File(context.filesDir, it) }
-        ?.takeIf(File::exists)
+    fun file(context: Context, relativePath: String?): File? = safeFile(context, relativePath)
+        ?.takeIf(File::isFile)
 
     fun delete(context: Context, relativePath: String?) {
-        relativePath?.let { File(context.filesDir, it).delete() }
+        safeFile(context, relativePath)?.delete()
     }
 
     fun createCameraDestination(context: Context): CameraDestination {
@@ -45,4 +43,12 @@ object ProductPhotoStore {
     }
 
     data class CameraDestination(val uri: Uri, val relativePath: String)
+
+    private fun safeFile(context: Context, relativePath: String?): File? {
+        if (relativePath.isNullOrBlank()) return null
+        val photoDirectory = File(context.filesDir, DIRECTORY).canonicalFile
+        val candidate = File(context.filesDir, relativePath).canonicalFile
+        val expectedPrefix = photoDirectory.path + File.separator
+        return candidate.takeIf { it.path.startsWith(expectedPrefix) }
+    }
 }

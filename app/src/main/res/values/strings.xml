@@ -50,6 +50,8 @@
     <string name="export_excel">Export database to Excel</string>
     <string name="excel_export_success">Database exported to Excel</string>
     <string name="excel_export_failed">Excel export failed: %1$s</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="privacy_policy_text">StockKeeper stores inventory records, customer details, notes, and photos only on this device. It does not send data, analytics, or advertising identifiers to the developer or third parties. Camera access is used only when you choose to take a product photo. Automatic cloud backup is disabled. ZIP backups and Excel files are created only when you request them and are not encrypted; you are responsible for protecting exported files. Uninstalling the app removes its private local data, but exported files must be deleted separately.</string>
     <string name="about">About</string>
     <string name="about_text">Offline warehouse inventory · Database version 1</string>
     <string name="operation_sale">Sale</string>

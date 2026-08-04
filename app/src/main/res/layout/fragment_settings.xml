@@ -34,6 +34,7 @@
         <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/shelfFilterSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/shelf" />
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="28dp" android:text="@string/about" android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_marginBottom="24dp" android:text="@string/about_text" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="@string/about_text" android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/privacyPolicyButton" style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:layout_marginBottom="24dp" android:text="@string/privacy_policy" />
     </LinearLayout>
 </ScrollView>
